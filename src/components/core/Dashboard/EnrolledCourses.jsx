@@ -13,6 +13,7 @@ const EnrolledCourses = () => {
     const getEnrolledCourses = async () => {
         try {
             const response = await getUserEnrolledCourses(token);
+            console.log("Printing Response in EnrolledCourses -> ", response);
             setEnrolledCourses(response);
         }
         catch (err) {
@@ -73,11 +74,11 @@ const EnrolledCourses = () => {
                                                 </div>
 
                                                 <div className="flex w-1/5 flex-col gap-2 px-2 py-3">
-                                                    <p>Progress: {course.progressPercentage || 0}%</p>
+                                                    <p>Progress: {course?.progressPercentage || 0}%</p>
 
                                                     {/* Progress Bar */}
                                                     <ProgressBar
-                                                        completed={course.progressPercentage || 0}
+                                                        completed={course?.progressPercentage || 0}
                                                         height="8px"
                                                         isLabelVisible={false}
                                                     />

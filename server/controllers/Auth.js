@@ -284,63 +284,59 @@ exports.changePassword = async (req, res) => {
 
     try {
 
-        // Get data frm req body
-        const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+
+        // Get user data 
         const userDetails = await User.findById(req.user.id);
 
-        // Validate
-        if (!currentPassword || !newPassword || !confirmNewPassword) {
-            return res.status(403).json({
-                success: false,
-                message: "Input fields incomplete, Please enter all the fields."
-            });
-        }
+        // Get data frm req body
+        const { oldPassword, newPassword } = req.body;
 
-        // Compare Pass
-        if (await bcrypt.compare(currentPassword, userDetails.password)) {
+        // Validate Old Password
+        const isPasswordMatch = await bcrypt.compare(
+            oldPassword,
+            userDetails.password,
+        );
 
-            if (newPassword !== confirmNewPassword) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Password and confirm password does not match",
-                });
-            }
-
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-            const updatedUserDetails = await User.findByIdAndUpdate(req.user.id,
-                { password: hashedPassword },
-                { new: true });
-
-
-            // Send Email to user
-            try {
-                const mailResponse = await mailSender(updatedUserDetails.email,
-                    passwordUpdated(updatedUserDetails.email,
-                        `Password updated successfully for ${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`));
-                console.log(mailResponse.response);
-            }
-            catch (err) {
-                console.log("Error occured while sending email: ", err);
-                return res.status(500).json({
-                    success: false,
-                    message: "Error occured while sending email", 
-                    error: err.message,
-                });
-            }
-
-            // Return res
-            return res.status(200).json({
-                success: true,
-                message: "Password Updated Successfully"
-            });
-        }
-        else {
+        if (!isPasswordMatch) {
             return res.status(401).json({
                 success: false,
-                message: "Current Password does not match."
+                message: "The Password is Incorrect",
             });
         }
+
+
+        // Update Password
+        const encryptedPassword = await bcrypt.hash(newPassword, 10);
+
+        const updatedUserDetails = await User.findByIdAndUpdate(req.user.id, 
+            {password: encryptedPassword},
+            {new: true}
+        );
+
+
+        // Send Email to user
+        try {
+            const mailResponse = await mailSender(updatedUserDetails.email,
+                "Password for your account has been updated",
+                passwordUpdated(updatedUserDetails.email,
+                    `Password updated successfully for ${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`));
+            console.log(mailResponse.response);
+        }
+        catch (err) {
+            console.log("Error occured while sending email: ", err);
+            return res.status(500).json({
+                success: false,
+                message: "Error occured while sending email",
+                error: err.message,
+            });
+        }
+
+        // Return res
+        return res.status(200).json({
+            success: true,
+            message: "Password Updated Successfully"
+        });
     }
     catch (err) {
         console.log(err);

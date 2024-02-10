@@ -98,7 +98,7 @@ const MyProfile = () => {
 
                         <div>
                             <p className="mb-2 text-sm text-richblack-600">Phone number</p>
-                            <p className="text-sm font-medium text-richblack-5">{user?.additionalDetails?.contactNo ?? "Add contact no"}</p>
+                            <p className="text-sm font-medium text-richblack-5">{user?.additionalDetails?.contactNumber ?? "Add contact no"}</p>
                         </div>
 
                         <div>

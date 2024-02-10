@@ -25,6 +25,7 @@ const viewCourseSlice = createSlice({
         },
         updateCompletedLectures: (state, action) => {
             state.completedLectures = [...state.completedLectures, action.payload]
+            // console.log("in store -> ", action.payload);
         },
     },
 })

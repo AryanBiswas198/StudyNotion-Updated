@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Iconbtn from "../../../../common/Iconbtn";
-import { GrAddCircle } from "react-icons/gr";
+import {MdAddCircleOutline} from "react-icons/md";
 import { useSelector } from "react-redux";
 import { BiRightArrow } from "react-icons/bi";
 import { useDispatch } from "react-redux";
@@ -15,7 +15,7 @@ const CourseBuilderForm = () => {
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [editSectionName, setEditSectionName] = useState(null);
-    const { course, editCourse } = useSelector((state) => state.course);
+    const { course } = useSelector((state) => state.course);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const { token } = useSelector((state) => state.auth);
@@ -25,10 +25,7 @@ const CourseBuilderForm = () => {
     }, []);
 
     const onSubmit = async (data) => {
-
-        console.log("Function Called");
         
-
         setLoading(true);
         let result;
 
@@ -41,20 +38,16 @@ const CourseBuilderForm = () => {
                     sectionId: editSectionName,
                     courseId: course._id,
                 }, token
-            );
+            )
         }
         else {
             console.log("Inside else");
-            const finalResult = await createSection(
+            result = await createSection(
                 {
                     sectionName: data.sectionName,
                     courseId: course._id,
                 }, token
-            );
-            console.log("Printing Final Result -> ", finalResult);
-            // dispatch(setCourse(result));
-            // setEditSectionName(null);
-            // setValue("sectionName", "");
+            )
         }
 
         console.log("Printing result --> ", result);
@@ -66,10 +59,7 @@ const CourseBuilderForm = () => {
             setEditSectionName(null);
             setValue("sectionName", "");
         }
-        else {
-            console.error("Unexpected result from the backend:", result);
-        }
-
+        
         // SetLoading -> False
         setLoading(false);
     }
@@ -115,39 +105,44 @@ const CourseBuilderForm = () => {
 
 
     return (
-        <div className="text-white">
-            <p>Course Builder</p>
+        <div className="space-y-8 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6">
+            <p className="text-2xl font-semibold text-richblack-5">Course Builder</p>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
-                    <label htmlFor="sectionName">Section name<sup>*</sup></label>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="flex flex-col space-y-2">
+                    <label htmlFor="sectionName" className="text-sm text-richblack-5" >
+                        Section name
+                        <sup className="text-pink-200">*</sup>
+                    </label>
                     <input
                         id="sectionName"
                         placeholder="Add Section Name"
                         {...register("sectionName", { required: true })}
-                        className="w-full"
+                        className="form-style w-full"
                     />
                     {
                         errors.sectionName && (
-                            <span>Section Name is Required</span>
+                            <span className="ml-2 text-xs tracking-wide text-pink-200">
+                                Section Name is Required
+                            </span>
                         )
                     }
                 </div>
 
-                <div className="mt-10 flex w-full">
+                <div className="flex items-end gap-x-4">
                     <Iconbtn
                         type="Submit"
                         text={editSectionName ? "Edit Section Name" : "Create Section"}
                         outline={true}
                         customClasses={"text-white"}
                     >
-                        <GrAddCircle className="text-yellow-50" />
+                        <MdAddCircleOutline className="text-yellow-50" />
                     </Iconbtn>
 
                     {
                         editSectionName && (
                             <button type="button" onClick={cancelEdit}
-                                className="text-sm text-richblack-300 underline ml-10"
+                                className="text-sm text-richblack-300 underline"
                             >
                                 Cancel Edit
                             </button>
@@ -157,10 +152,6 @@ const CourseBuilderForm = () => {
             </form>
 
 
-            {/* <NestedView handleChangeEditSectionName={handleChangeEditSectionName} /> */}
-
-            {/* <h1>{course?.courseContent?.length}</h1>
-            {JSON.stringify(course)} */}
 
             {
                 course.courseContent.length > 0 && (
@@ -170,11 +161,11 @@ const CourseBuilderForm = () => {
 
 
             <div className="flex justify-end gap-x-3">
-                <button onClick={goBack} className="rounded-md cursor-pointer flex items-center ">
+                <button onClick={goBack} className={`flex cursor-pointer items-center gap-x-2 rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900`}>
                     Back
                 </button>
 
-                <Iconbtn text={"Next"} onClick={goToNext}>
+                <Iconbtn disabled={loading} text={"Next"} onClick={goToNext}>
                     <BiRightArrow />
                 </Iconbtn>
             </div>

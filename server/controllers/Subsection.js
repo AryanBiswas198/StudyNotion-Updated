@@ -17,13 +17,19 @@ exports.createSubSection = async(req, res) => {
 
     try{
         // Data fetch
-        const {title, timeDuration, description, sectionId} = req.body;
+        const {sectionId, title, description} = req.body;
+
+        console.log("Desc", description);
+        console.log("Title", title);
 
         // Extract URL
-        const video = req.files.videoFile;
+        const video = req.files.video;
+
+        console.log("Video", video);
+
 
         // Validate
-        if(!title || !timeDuration || !description || !video || !sectionId){
+        if(!title || !description || !video || !sectionId){
             return res.status(404).json({
                 success: false,
                 message: "Input field are incomplete. Please fill all the details."
@@ -79,8 +85,8 @@ exports.updateSubSection = async(req, res) => {
     // update sub section and return res
 
     try{
-        const {sectionId, title, description} = req.body;
-        const subSection = await SubSection.findById(sectionId);
+        const {sectionId, subSectionId, title, description} = req.body;
+        const subSection = await SubSection.findById(subSectionId);
 
         if(!subSection){
             return res.status(400).json({
@@ -107,8 +113,11 @@ exports.updateSubSection = async(req, res) => {
 
         await subSection.save();
 
+        const updatedSection = await Section.findById(sectionId).populate("subSection").exec();
+
         return res.status(200).json({
             success: true,
+            data: updatedSection,
             message: "Sub Section updated successfully",
         });
     }   
@@ -149,8 +158,11 @@ exports.deleteSubSection = async(req, res) => {
             });
         }
 
+        const updatedSection = await Section.findById(sectionId).populate("subSection");
+
         return res.status(200).json({
             success: true,
+            data: updatedSection,
             message: "Sub Section deleted successfully",
         });
     }

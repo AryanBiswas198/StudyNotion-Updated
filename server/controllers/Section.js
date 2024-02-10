@@ -1,5 +1,6 @@
 const Section = require("../models/Section");
 const Course = require("../models/Course");
+const SubSectionModal = require("../models/SubSection");
 
 // create 
 exports.createSection = async(req, res) => {
@@ -12,11 +13,10 @@ exports.createSection = async(req, res) => {
 
     try{
         // Fetch data
-        console.log("Hello Hindol");
 
         const {sectionName, courseId} = req.body;
 
-        console.log(sectionName, courseId);
+        // console.log(sectionName, courseId);
 
 
         // Validate
@@ -81,7 +81,7 @@ exports.updateSection = async(req, res) => {
 
     try{
         // Fetch Updated Data
-        const {sectionName, sectionId} = req.body;
+        const {sectionName, sectionId, courseId} = req.body;
 
 
         // Update on the basis of id
@@ -91,9 +91,19 @@ exports.updateSection = async(req, res) => {
                             {new: true},
         );
 
+        const course = await Course.findById(courseId)
+            .populate({
+                path: "courseContent",
+                populate: {
+                    path: "subSection",
+                },
+            })
+            .exec();
+
         return res.status(200).json({
             success: true,
             message: section,
+            data: course,
         });
     }
     catch(err){
@@ -146,7 +156,8 @@ exports.deleteSection = async(req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Section deleted successfully"
+            message: "Section deleted successfully",
+            data: course,
         });
     }
     catch(err){
