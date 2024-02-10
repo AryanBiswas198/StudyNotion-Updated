@@ -37,8 +37,9 @@ exports.updateCourseProgress = async(req, res) => {
             }
 
             // Push into completed Videos
-            courseProgress.completedVideos.push(subSectionId);
         }
+        courseProgress.completedVideos.push(subSectionId);
+        
         await courseProgress.save();
 
         return res.status(200).json({

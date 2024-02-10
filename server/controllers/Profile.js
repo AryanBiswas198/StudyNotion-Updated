@@ -233,7 +233,7 @@ exports.getEnrolledCourses = async (req, res) => {
             }
 
             let courseProgressCount = await CourseProgress.findOne({
-                courseID: userDetails.courses[i]._id,
+                courseId: userDetails.courses[i]._id,
                 userId: userId,
             })
 
